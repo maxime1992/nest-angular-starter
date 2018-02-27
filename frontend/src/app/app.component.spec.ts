@@ -5,66 +5,67 @@ import {
   inject,
   TestBed,
 } from '@angular/core/testing';
-import { Store } from '@ngrx/store';
+import { Store, StoreModule } from '@ngrx/store';
 import { TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 import { LANGUAGES } from 'app/core/injection-tokens';
 import * as UiActions from 'app/shared/states/ui/ui.actions';
 import { AppComponent } from './app.component';
+import { reducers, metaReducers } from 'app/shared/states/root.reducer';
+import { IStore } from 'app/shared/interfaces/store.interface';
 
 describe('AppComponent', () => {
   let fixture: ComponentFixture<AppComponent>;
+  let store: Store<IStore>;
+  let translateService: TranslateMockService;
 
   beforeEach(
     async(() => {
       TestBed.configureTestingModule({
         declarations: [AppComponent],
+        imports: [StoreModule.forRoot(reducers, { metaReducers })],
         providers: [
           { provide: TranslateService, useClass: TranslateMockService },
           { provide: LANGUAGES, useValue: ['en', 'fr'] },
-          { provide: Store, useClass: StoreMockService },
         ],
         schemas: [NO_ERRORS_SCHEMA],
       }).compileComponents();
     })
   );
 
-  beforeEach(
-    async(() => {
-      fixture = TestBed.createComponent(AppComponent);
-    })
-  );
+  beforeEach(() => {
+    fixture = TestBed.createComponent(AppComponent);
 
-  it(
-    'should set the lang by using the one from the browser if the environment variable for that is true',
-    inject(
-      [TranslateService, Store],
-      (translateService: TranslateMockService, store: StoreMockService) => {
-        spyOn(translateService, 'getBrowserLang').and.callThrough();
-        spyOn(translateService, 'setDefaultLang');
-        spyOn(translateService, 'use');
-        spyOn(store, 'dispatch');
+    store = TestBed.get(Store);
+    translateService = TestBed.get(TranslateService);
+  });
 
-        // simulate that the browser is set to english by default
-        translateService.browserLang = 'en';
+  it('should set the lang by using the one from the browser if the environment variable for that is true', () => {
+    spyOn(translateService, 'getBrowserLang').and.callThrough();
+    spyOn(translateService, 'setDefaultLang');
+    spyOn(translateService, 'use');
+    spyOn(store, 'dispatch').and.callThrough();
 
-        store.updateStore({
-          ui: { language: 'en' },
-        });
+    // simulate that the browser is set to english by default
+    translateService.browserLang = 'en';
 
-        // calling detectChanges for the first time will trigger the ngOnInit
-        fixture.detectChanges();
+    store.dispatch(
+      new UiActions.SetLanguage({
+        language: 'en',
+      })
+    );
 
-        expect(translateService.setDefaultLang).toHaveBeenCalledWith('en');
-        expect(store.dispatch).toHaveBeenCalledWith(
-          new UiActions.SetLanguage({ language: 'en' })
-        );
+    // calling detectChanges for the first time will trigger the ngOnInit
+    fixture.detectChanges();
 
-        expect(translateService.use).toHaveBeenCalledWith('en');
-      }
-    )
-  );
+    expect(translateService.setDefaultLang).toHaveBeenCalledWith('en');
+    expect(store.dispatch).toHaveBeenCalledWith(
+      new UiActions.SetLanguage({ language: 'en' })
+    );
+
+    expect(translateService.use).toHaveBeenCalledWith('en');
+  });
 });
 
 @Injectable()
@@ -78,20 +79,4 @@ export class TranslateMockService {
   setDefaultLang(defaultLang: string) {}
 
   use(lang: string) {}
-}
-
-@Injectable()
-export class StoreMockService extends BehaviorSubject<any> {
-  value: any;
-
-  // as we extend BehaviorSubject, we have access to the `value` property
-  constructor() {
-    super(null);
-  }
-
-  dispatch(action: any) {}
-
-  updateStore(state) {
-    this.next(state);
-  }
 }
