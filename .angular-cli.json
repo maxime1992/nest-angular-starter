@@ -15,8 +15,8 @@
       "main": "main.ts",
       "polyfills": "polyfills.ts",
       "test": "test.ts",
-      "tsconfig": "frontend/tsconfig.app.json",
-      "testTsconfig": "frontend/tsconfig.spec.json",
+      "tsconfig": "../src/tsconfig.app.json",
+      "testTsconfig": "../src/tsconfig.spec.json",
       "prefix": "app",
       "serviceWorker": false,
       "styles": [
@@ -43,7 +43,7 @@
   ],
   "test": {
     "karma": {
-      "config": "./karma.conf.js"
+      "config": "./frontend/karma.conf.js"
     }
   },
   "defaults": {

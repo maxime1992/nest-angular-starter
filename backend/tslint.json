@@ -7,20 +7,20 @@
   "rules": {
     "quotemark": [true, "single"],
     "member-access": [false],
-    "ordered-imports": [false],
+    "ordered-imports": [true],
     "member-ordering": [false],
-    "curly": false,
+    "curly": true,
     "interface-name": [false],
-    "array-type": [false],
+    "array-type": [true],
     "no-empty-interface": false,
-    "no-empty": false,
+    "no-empty": true,
     "arrow-parens": false,
     "object-literal-sort-keys": false,
-    "no-unused-expression": false,
+    "no-unused-expression": true,
     "max-classes-per-file": [false],
-    "variable-name": [false],
+    "variable-name": [true],
     "one-line": [false],
-    "one-variable-per-declaration": [false]
+    "one-variable-per-declaration": [true]
   },
   "rulesDirectory": []
 }
